@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
+
 // const encrypt = require("mongoose-encryption"); //This is the encryption plugin
 // const md5 = require("md5");   //This is the md5 hashing algorithm
 const bcrypt = require("bcrypt"); //This is the bcrypt hashing algorithm
@@ -63,7 +64,7 @@ app.post("/register", function(req, res){
 // console.log(md5("qwerty")); check the md5 hash of the password
 
 // Post request for login
-
+//--------------------------------------------------------------------------------------------
 // POST request
 app.post("/login", function(req, res){
    
