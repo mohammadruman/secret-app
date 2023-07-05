@@ -4,8 +4,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
-// const encrypt = require("mongoose-encryption");
-const md5 = require("md5");
+// const encrypt = require("mongoose-encryption"); //This is the encryption plugin
+// const md5 = require("md5");   //This is the md5 hashing algorithm
+const bcrypt = require("bcrypt"); //This is the bcrypt hashing algorithm
+const saltRounds = 10; //This is the number of salt rounds for bcrypt
 mongoose.connect('mongodb://127.0.0.1:27017/UserDb', {useNewUrlParser: true, useUnifiedTopology: true});
 
 const app = express();
@@ -44,10 +46,10 @@ app.get("/register", function(req, res){
 
 // POST request
 app.post("/register", function(req, res){
-   
+    bcrypt.hash(req.body.password, saltRounds).then(function(hash) {
         const newUser = new User({
             email: req.body.username,
-            password: md5(req.body.password)
+            password:hash
           });
           
       newUser.save().then(()=>{
@@ -56,6 +58,7 @@ app.post("/register", function(req, res){
         .catch((err)=>{
             console.log(err);
         });
+    });
         });
 // console.log(md5("qwerty")); check the md5 hash of the password
 
@@ -68,9 +71,11 @@ app.post("/login", function(req, res){
     password = req.body.password;
     User.findOne({email: username}, ).then((founduser)=>{
         if(founduser){
-            if(founduser.password === password){
-                res.render("secrets");
-            }
+            bcrypt.compare(password, founduser.password).then(function(result) {
+                if(result === true){
+                    res.render("secrets");
+                }
+            });
         }
     })
     .catch((err)=>{
